@@ -19,14 +19,24 @@ public class TeamController {
 	
 	
 	
+	/* 워니자리 */
+	
+	
+	
+	
 	
 	
 	
 	/* 셍나 */
-	
-	
-	
-	
+	/*
+	 /teamjoin=control.TeamJoinController
+	/teamleave=control.TeamLeaveController
+	/teamattendance=control.TeamAttendanceController
+	/teammain=control.TeamMainController
+	/teamselectexaminer=control.TeamSelectExaminerController
+	/teamdismiss=control.TeamDismissController
+	/teamreqaccept=control.TeamReqAcceptController
+	 */
 	
 	
 	
