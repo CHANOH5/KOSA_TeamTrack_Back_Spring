@@ -10,6 +10,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.my.exception.AddException;
 import com.my.exception.FindException;
@@ -17,19 +19,18 @@ import com.my.exception.ModifyException;
 import com.my.exception.RemoveException;
 import com.my.notice.dto.NoticeDTO;
 
-public class NoticeDAOImpl implements NoticeDAO{
-	private SqlSessionFactory sqlSessionFactory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-	public NoticeDAOImpl() {
-		String resource = "com/my/sql/mybatis-config.xml";
-		InputStream inputStream;
-		try{
-			inputStream = Resources.getResourceAsStream(resource);
-			sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+
+@Repository
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+public class NoticeDAOImpl implements NoticeDAO{
+	
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
 
 	@Override
 	public List<NoticeDTO> selectNoticeAll(int startRow, int endRow, Integer teamNo) throws FindException{

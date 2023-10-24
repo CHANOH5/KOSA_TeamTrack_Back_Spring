@@ -1,16 +1,14 @@
 package com.my.team.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.my.exception.AddException;
 import com.my.exception.FindException;
@@ -24,26 +22,17 @@ import com.my.team.dto.TeamDTO;
 import com.my.team.dto.TeamHashtagDTO;
 import com.my.team.dto.TeamMemberDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Repository
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TeamDAOImpl implements TeamDAO {
 
+	@Autowired
 	private SqlSessionFactory sqlSessionFactory;
-
-	public TeamDAOImpl() {
-
-		String resource = "com/my/sql/mybatis-config.xml";
-		InputStream inputStream;
-
-		try {
-
-			inputStream = Resources.getResourceAsStream(resource);
-
-			sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} // try-catch
-
-	} // constructor
 
 	//	---------------------------------------------------------------------------------
 
