@@ -24,7 +24,6 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-resources/
 /build/classes/*
 /webapp/
 
