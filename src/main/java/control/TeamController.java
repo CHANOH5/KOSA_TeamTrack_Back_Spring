@@ -1,16 +1,34 @@
 package control;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.my.rank.service.RankServiceImpl;
 import com.my.team.service.TeamServiceImpl;
 
-public abstract class TeamController implements Controller {
+
+@RestController
+public class TeamController {
 	
-	protected TeamServiceImpl service;
-	protected RankServiceImpl rankservice;
+	@Autowired protected TeamServiceImpl service;
+	@Autowired protected RankServiceImpl rankservice;
 
-	public TeamController() {
-		service = TeamServiceImpl.getInstance();
-		rankservice = RankServiceImpl.getInstance();
-	}
-
+	/* 서현웅니 */
+	
+	
+	
+	
+	
+	
+	
+	
+	/* 셍나 */
+	
+	
+	
+	
+	
+	
+	
+	
 } // end class

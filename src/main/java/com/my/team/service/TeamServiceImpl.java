@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.my.customer.dao.CustomerRepository;
 import com.my.exception.AddException;
 import com.my.exception.FindException;
 import com.my.exception.ModifyException;
@@ -29,6 +33,8 @@ import com.my.team.dto.TeamMemberDTO;
 import com.my.util.MainPageGroup;
 import com.my.util.PageGroup;
 
+
+@Service
 public class TeamServiceImpl implements TeamService {
 
 	private TeamDAO teamDAO;
@@ -36,18 +42,8 @@ public class TeamServiceImpl implements TeamService {
 	private TaskDAO taskDAO;
 	private QnaBoardDAO qnaDAO;
 	
-	private static TeamServiceImpl service = new TeamServiceImpl();
-
-	private TeamServiceImpl() {
-		teamDAO = new TeamDAOImpl();
-		noticeDAO = new NoticeDAOImpl();
-		taskDAO = new TaskDAOImpl();
-		qnaDAO = new QnaBoardDAOImpl();
-	}
-
-	public static TeamServiceImpl getInstance() {
-		return service;
-	}
+	@Autowired
+	private TeamDAOImpl teamDAOImpl;
 
 	// ------------------------------------------------------------------------
 
