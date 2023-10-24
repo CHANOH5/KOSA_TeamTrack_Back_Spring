@@ -33,16 +33,5 @@ public class MyControllerAdvice {
 		
 		return new ResponseEntity<>("파일의 크기가 너무 큽니다", headers, HttpStatus.BAD_REQUEST);
 	} // maxUploadSize()
-
-//	@ExceptionHandler(Exception.class)
-//	@ResponseBody
-//	public Map<String, Object> exceptionHandler(Exception e) {
-//		Map<String, Object> map = new HashMap<>();
-//
-//		map.put("status", 0);
-//		map.put("msg", e.getMessage());
-//
-//		return map;
-//	} // exceptionHandler()
-
+	
 } // end class
