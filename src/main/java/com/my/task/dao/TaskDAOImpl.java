@@ -9,6 +9,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.my.exception.AddException;
 import com.my.exception.FindException;
@@ -17,21 +19,17 @@ import com.my.exception.RemoveException;
 import com.my.task.dto.MemberTaskDTO;
 import com.my.task.dto.TaskDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Repository
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TaskDAOImpl implements TaskDAO {
+	
+	@Autowired
 	private SqlSessionFactory sqlSessionFactory;
-
-	public TaskDAOImpl() {
-		String resource="com/my/sql/mybatis-config.xml";
-		InputStream inputStream;
-
-		try {
-			inputStream=Resources.getResourceAsStream(resource);
-			sqlSessionFactory=new SqlSessionFactoryBuilder().build(inputStream);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	public List<TaskDTO> selectMainTaskList(Integer teamNo, String id) throws FindException {
 		SqlSession session=null;

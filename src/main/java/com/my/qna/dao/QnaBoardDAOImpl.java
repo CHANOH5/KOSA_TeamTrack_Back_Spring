@@ -11,6 +11,8 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.my.exception.AddException;
 import com.my.exception.FindException;
@@ -18,31 +20,19 @@ import com.my.exception.ModifyException;
 import com.my.exception.RemoveException;
 import com.my.qna.dto.QnaBoardDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@Repository
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class QnaBoardDAOImpl implements QnaBoardDAO {
 
+	@Autowired
 	// Mybatis에서 db와 연결하고 sql문을 실행 할 SqlSessionFactory 인터페이스 선언
 	private SqlSessionFactory sqlSessionFactory;
-
-	public QnaBoardDAOImpl() {
-
-		// Mybatis 설정파일 로드
-		String resource = "com/my/sql/mybatis-config.xml";
-		InputStream inputStream;
-
-		try {
-
-			// 리소스 경로에 파일 읽어들이는 클래스(Resources)
-			inputStream = Resources.getResourceAsStream(resource);
-
-			// sqlSessionFactory를 멤버변수로 만듦
-			sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} // try-catch
-
-	} // constructor
-
 
 	@Override
 	public void create(Integer teamNo, QnaBoardDTO qnaBoardDTO) throws AddException {
