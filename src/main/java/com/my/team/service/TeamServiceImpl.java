@@ -10,18 +10,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.my.customer.dao.CustomerRepository;
 import com.my.exception.AddException;
 import com.my.exception.FindException;
 import com.my.exception.ModifyException;
 import com.my.exception.RemoveException;
 import com.my.notice.dao.NoticeDAO;
-import com.my.notice.dao.NoticeDAOImpl;
 import com.my.notice.dto.NoticeDTO;
 import com.my.qna.dao.QnaBoardDAO;
-import com.my.qna.dao.QnaBoardDAOImpl;
 import com.my.task.dao.TaskDAO;
-import com.my.task.dao.TaskDAOImpl;
 import com.my.task.dto.TaskDTO;
 import com.my.team.dao.TeamDAO;
 import com.my.team.dao.TeamDAOImpl;
@@ -33,8 +29,14 @@ import com.my.team.dto.TeamMemberDTO;
 import com.my.util.MainPageGroup;
 import com.my.util.PageGroup;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 @Service
+@Setter @Getter  @NoArgsConstructor @AllArgsConstructor
 public class TeamServiceImpl implements TeamService {
 
 	private TeamDAO teamDAO;
@@ -44,6 +46,12 @@ public class TeamServiceImpl implements TeamService {
 	
 	@Autowired
 	private TeamDAOImpl teamDAOImpl;
+	
+	private static TeamServiceImpl service = new TeamServiceImpl();
+	
+	public static TeamServiceImpl getInstance() {
+		return service;
+	}
 
 	// ------------------------------------------------------------------------
 
