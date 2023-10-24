@@ -21,8 +21,6 @@
 		private String phone;			// 유저 번호
 		private String email;			// 유저 이메일
 		private Integer status;			// 유저 상태 -> 탈퇴: 0, 가입중: 1
-	
-		// 비상비상
 		
 		public CustomerDTO(String name, String birthday, String phone, String email){
 			this.name = name;
