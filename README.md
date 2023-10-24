@@ -3,7 +3,7 @@
 
 <br><br>
 
-## 🍅 TeamTrack!!_팀트랙!! : Front Controller 패턴의 Java Servlet을 사용한 프로젝트
+## 🍅 TeamTrack!!_팀트랙!! : 이전의 프로젝트를 스프링 프로젝트로 변경
 <br>
 
 <div align="left">
