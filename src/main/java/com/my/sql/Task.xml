@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.my.task.TaskMapper">
+
+	<!-- 메인 과제 리스트 가져오기 -->
+	<select id="selectMainTaskList" resultType="TaskDTO"
+		parameterType="java.util.HashMap">
+		SELECT a.*, c.nickname
+		FROM (
+			SELECT t.task_no, t.title, t.regdate, t.enddate, t.id
+			FROM ${tableName1} t
+			WHERE t.enddate-SYSDATE>0 AND t.id!=#{id} AND regdate IS NOT NULL
+			MINUS
+			SELECT t.task_no, t.title, t.regdate, t.enddate, t.id
+			FROM ${tableName1} t JOIN ${tableName2} m ON(t.task_no=m.task_no)
+			WHERE t.enddate-SYSDATE>0 AND m.id=#{id} AND regdate IS NOT NULL
+		) a JOIN customer c ON (a.id=c.id)
+		ORDER BY a.enddate
+	</select>
+
+	<!-- 전체 과제 리스트 가져오기 -->
+	<select id="selectAllTaskList" resultType="TaskDTO"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM (
+			SELECT rownum rn, a.*
+			FROM (
+				SELECT t.task_no, t.title, t.regdate, c.nickname
+				FROM ${tableName} t JOIN customer c ON (t.id=c.id)
+				WHERE regdate IS NOT NULL AND t.enddate-SYSDATE&lt;0
+				ORDER BY t.regdate
+				<if test="desc">DESC</if>
+			) a
+		) t
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 전체 과제 개수 가져오기 -->
+	<select id="selectAllTaskCount" resultType="Integer">
+		SELECT COUNT(*) FROM
+		${tableName} WHERE enddate-SYSDATE&lt;0
+	</select>
+
+	<!-- 완료한 과제 리스트 가져오기 -->
+	<select id="selectCompleteTaskList" resultType="MemberTaskDTO"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM ( 
+			SELECT rownum rn, a.*
+				FROM ( SELECT j.*, c.nickname
+					FROM ( SELECT m.task_no, m.hwscore, t.id, t.title, m.submitdate
+			   			FROM ${tableName1} m JOIN
+			   			${tableName2} t ON (m.task_no=t.task_no)
+			   			WHERE m.id=#{id}
+					) j JOIN customer c ON (j.id=c.id)
+					ORDER BY j.submitdate
+					<if test="desc">DESC</if>
+				) a
+			) t
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 완료한 과제 개수 가져오기 -->
+	<select id="selectCompleteTaskCount" resultType="Integer"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(*) FROM ${tableName} WHERE id=#{id}
+	</select>
+
+	<!-- 출제한 과제 리스트 가져오기 -->
+	<select id="selectMyTaskList" resultType="TaskDTO"
+		parameterType="java.util.HashMap">
+		SELECT *
+		FROM ( SELECT rownum rn, a.*
+		FROM ( SELECT task_no, title,
+		regdate,
+		avg_reviewscore FROM ${tableName}
+		WHERE id=#{id} AND regdate IS NOT NULL
+		ORDER BY
+		regdate
+		<if test="desc">DESC</if>
+		) a
+		) t
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 출제한 과제 개수 가져오기 -->
+	<select id="selectMyTaskCount" resultType="Integer"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(*) FROM ${tableName} WHERE id=#{id}
+	</select>
+
+	<!-- 과제 정보 가져오기 -->
+	<select id="selectTaskInfo" resultType="TaskDTO"
+		parameterType="java.util.HashMap">
+		SELECT t.task_no, t.title, c.nickname
+		FROM ${tableName} t JOIN customer c ON (t.id=c.id)
+		WHERE task_no=#{taskNo}
+	</select>
+
+	<!-- 과제 답안 가져오기 -->
+	<select id="selectQuizAnswer" resultType="Integer"
+		parameterType="java.util.HashMap">
+		SELECT answer
+		FROM ${tableName}
+		WHERE task_no=#{taskNo}
+		ORDER BY question_no
+	</select>
+
+	<!-- 팀원 답안 가져오기 -->
+	<select id="selectMemberAnswer" resultType="Integer"
+		parameterType="java.util.HashMap">
+		SELECT answer
+		FROM ${tableName}
+		WHERE task_no=#{taskNo}
+		AND id=#{id}
+		ORDER BY question_no
+	</select>
+
+	<!-- 과제 점수 가져오기 -->
+	<select id="selectMemberScore" resultType="Integer"
+		parameterType="java.util.HashMap">
+		SELECT hwscore FROM ${tableName}
+		WHERE task_no=#{taskNo}
+		AND id=#{id}
+	</select>
+
+	<!-- 과제 정보 업데이트하기 -->
+	<update id="updateTask" parameterType="java.util.HashMap">
+		UPDATE ${tableName}
+		SET regdate=SYSDATE, title=#{title}
+		WHERE task_no=#{taskNo}
+	</update>
+	
+	<!-- 과제 답안 생성하기 -->
+	<insert id="insertQuizAnswer" parameterType="java.util.HashMap">
+		INSERT INTO ${tableName} (question_no, task_no, answer) VALUES (#{questionNo}, #{taskNo}, #{answer})
+	</insert>
+	
+	<!-- 출제자 여부 체크하기 -->
+	<select id="selectTaskId" resultType="TaskDTO">
+		SELECT id, task_no
+		FROM ${tableName}
+		WHERE duedate1-SYSDATE&lt;=0 AND duedate2-SYSDATE>=0 AND regdate IS NULL
+	</select>
+	
+	<!-- 원희 - 가입일 지난 후 등록된 과제 개수 -->
+	<select id="selectJoinAfterTaskCount" resultType="Integer" parameterType="hashmap">
+		SELECT COUNT(*)
+		FROM ${tableName}
+		WHERE regdate > (SELECT join_date FROM ${tableName2} WHERE id=#{id})
+	</select>
+	<!-- 과제 답안 개수 가져오기 -->
+	<select id="selectAnswerCount" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT COUNT(*) FROM ${tableName} WHERE task_no=#{taskNo}
+	</select>
+	
+	<!-- 팀원 답안 생성하기 -->
+	<insert id="insertMemberAnswer" parameterType="java.util.HashMap">
+		INSERT INTO ${tableName} (question_no, task_no, id, answer) VALUES (#{questionNo}, #{taskNo}, #{id}, #{answer})
+	</insert>
+	
+	<!-- 팀원 과제 정보 생성하기 -->
+	<insert id="insertMemberScore" parameterType="java.util.HashMap">
+		INSERT INTO ${tableName} (task_no, id, hwscore, reviewscore, submitdate) VALUES (#{taskNo}, #{id}, #{hwscore}, #{reviewScore}, SYSDATE)
+	</insert>
+	
+	<!-- 팀원 평점 업데이트하기 -->
+	<update id="updateReviewScore" parameterType="java.util.HashMap">
+		UPDATE ${tableName} SET reviewscore=#{reviewScore} WHERE id=#{id} AND task_no=#{taskNo}
+	</update>
+
+	<!-- 과제 평점 업데이트하기 -->
+	<update id="updateAvgReviewScore" parameterType="java.util.HashMap">
+		UPDATE ${tableName1} SET avg_reviewscore=(SELECT SUM(reviewscore)/COUNT(*) FROM ${tableName2} WHERE task_no=#{taskNo}) WHERE task_no=#{taskNo}
+	</update>
+
+</mapper>

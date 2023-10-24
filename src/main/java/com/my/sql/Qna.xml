@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.my.qna.QnaBoardMapper">
+
+	<!-- qna 게시글 등록 -->
+	<insert id="create" parameterType = "hashmap">
+		INSERT INTO ${tableName}(qna_no, id, title, content, regdate)
+		VALUES (ADMIN.QNA_NO${teamNo}_SEQ.NEXTVAL, #{id, jdbcType=VARCHAR}, #{title, jdbcType=VARCHAR}, #{content, jdbcType=VARCHAR}, sysdate)
+	</insert>
+
+	<!-- FROM ${tableName} -->
+	<!-- 전체 게시글 조회 -->
+	<select id="selectAll" resultType="QnaBoardDTO" parameterType = "hashmap">
+			SELECT * 
+			FROM (SELECT rownum rn, a.* 
+			     FROM (SELECT *
+			           FROM ${tableName}
+			           ORDER BY qna_no DESC
+			          ) a
+			      )
+			 WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+	
+	<!-- 전체 게시글 개수 가져오기 -->
+	<select id="selectAllCount" resultType="Integer">
+		SELECT COUNT(*)
+		FROM ${tableName} 
+	</select>
+	
+	<!-- 게시글 상세페이지 가져오기 -->
+	<select id="selectByQnaNo" resultType="QnaBoardDTO">
+		SELECT *
+		FROM ${tableName}
+		WHERE qna_no = #{qnaNo}
+	</select>
+	
+	<!-- 게시글 업데이트 -->
+	<update id="update" parameterType="QnaBoardDTO">
+			UPDATE ${tableName}
+			SET title = #{title, jdbcType=VARCHAR}, content = #{content, jdbcType=VARCHAR}, updatedate = sysdate
+			WHERE qna_no = #{qnaNo}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<update id="delete" parameterType="hashmap">
+			UPDATE ${tableName}
+			SET status = 0
+			WHERE qna_no = #{qnaNo}
+	</update>
+	
+	<!-- 멤버인지 아닌지 확인 -->
+  	<select id="selectTeamMemberStatus" parameterType="hashmap" resultType="int">
+		SELECT COUNT(*)
+		FROM TEAMMEMBER_${teamNo}
+		WHERE ID = #{id} AND STATUS <![CDATA[ = 1 ]]>
+  	</select>
+</mapper>

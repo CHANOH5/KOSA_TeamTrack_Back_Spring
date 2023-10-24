@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.my.rank.RankMapper">
+
+  <select id="selectByMonth" resultType="RankDTO" parameterType="java.util.HashMap">
+	SELECT tm.id ID, NVL(mr.RANK_NO,0) RANK_NO, NVL(mr.RANK_DATE,sysdate) RANK_DATE
+	, NVL(extract(month from rank_date),extract(month from sysdate)) as month
+	, NVL(mr.TOTALSCORE,0) TOTALSCORE
+	, DENSE_RANK() OVER(ORDER BY NVL(mr.TOTALSCORE,0) desc) AS RANK
+	, NVL(c.NICKNAME,'-') NICKNAME
+	FROM MEMBER_RANK_${team_no} mr JOIN CUSTOMER c ON (mr.ID = c.ID)
+	    RIGHT JOIN teammember_${team_no} tm on (mr.id = tm.id)
+	WHERE extract(month from rank_date)=#{month} or extract(month from rank_date) is null
+	ORDER BY RANK
+  </select>
+  
+  <select id="selectAllRank" resultType="RankDTO" parameterType="java.util.HashMap">
+	SELECT rank_no, rank_date, rank, totalscore, id, extract(month from rank_date) as month 
+  	FROM member_rank_${team_no}
+  	ORDER BY month DESC
+  </select>
+  
+  <select id="selectMemberId" resultType="TeamMemberDTO" parameterType="java.util.HashMap">
+	SELECT id, extract(month from join_date) as month 
+	FROM teammember_${team_no}
+	WHERE extract(month from join_date) &lt;= #{month}
+  </select>
+  
+  <insert id="insertRankInfo" parameterType="java.util.HashMap">
+  	INSERT INTO MEMBER_RANK_${team_no}(rank_no, rank_date, rank, totalscore, id)
+	VALUES (rank_no${team_no}_seq.nextval, sysdate, 0, 0, #{id})
+  </insert>
+  
+  <update id="updateRankInfo" parameterType="java.util.HashMap">
+  	UPDATE member_rank_${team_no}
+	SET rank_date=#{rankDate}, rank=#{rank}, totalscore=#{totalScore} 
+	WHERE id=#{id} and extract(month from rank_date)=#{month}
+  </update>
+  
+  
+  <select id="selectAttendanceDay" resultType="AttendanceDTO" parameterType="java.util.HashMap">
+	SELECT NVL(count(a.ATTENDANCE_DATE),0) as attendanceday
+     , (LAST_DAY(#{date})-TRUNC(TO_DATE(#{date}, 'yyyy-MM-DD'), 'MM')+1) as monthday
+     , (CASE WHEN extract (month from a.attendance_date) IS NULL THEN #{month}
+     	ELSE extract (month from a.attendance_date) END) as MONTH
+     , t.id as Id
+	FROM ATTENDANCE_${team_no} a RIGHT JOIN TEAMMEMBER_${team_no} t ON a.ID = t.ID
+	WHERE extract (month from a.attendance_date)=#{month} OR extract (month from a.attendance_date) IS NULL 
+	GROUP BY t.id, extract (month from a.attendance_date)
+	ORDER BY attendanceday DESC
+  </select>
+  
+   
+  <select id="selectAllTask" resultType="TaskDTO">
+  	SELECT * FROM TASK_9999
+  </select>
+  
+  
+  <select id="countMonthlyTask" resultType="TaskDTO" parameterType="java.util.HashMap">
+	SELECT NVL(COUNT(task_no),0) AS monthlytasknum, extract (month from enddate) AS month
+	FROM TASK_${team_no}
+	GROUP BY extract (month from enddate)
+	HAVING extract (month from enddate)=#{month}
+  </select>
+  
+  <!-- 과제 푸는 사람 기준의 과제 점수 -->
+  <select id="selectTaskScore" resultType="MemberTaskDTO" parameterType="java.util.HashMap">
+	SELECT ms.id as id
+	  , NVL(SUM(ms.hwscore),0) as totalscore
+	  , NVL(COUNT(ms.task_no),0) as tasknum
+	  , extract (month from t.enddate) as month
+	FROM MEMBERSCORE_${team_no} ms JOIN TASK_${team_no} t ON (ms.task_no = t.task_no)
+	WHERE extract (month from t.enddate) = #{month}
+	GROUP BY ms.id, extract (month from t.enddate)
+  </select>
+  
+  <!-- 과제 제출하는 사람 기준의 과제 점수 -->
+  <select id="selectTaskSubmitScore" resultType="TaskDTO" parameterType="java.util.HashMap">
+  	SELECT id, COUNT(*) AS taskSubmitNum
+	FROM task_${team_no}
+	WHERE (duedate2-regdate) &gt; 0 AND EXTRACT(MONTH FROM ENDDATE)=#{month}
+	GROUP BY id
+  </select>
+  
+  <select id="selectReviewScore" resultType="TaskDTO" parameterType="java.util.HashMap">	
+	SELECT id, NVL(sum(avg_reviewscore), 0) as totalreviewscore, extract (month from enddate) as month
+	FROM TASK_${team_no}
+	WHERE extract (month from enddate)=#{month}
+	GROUP BY id, extract (month from enddate)
+  </select>
+  
+  
+  <select id="selectQnAScore" resultType="QnaBoardCommentDTO" parameterType="java.util.HashMap">
+	SELECT teammember_id
+		, extract (month from regdate) as month
+		, (SELECT COUNT(pickeddate) FROM QNACOMMENT_${team_no} where pickeddate IS NOT NULL) as pickednum
+	FROM QNACOMMENT_${team_no}
+	WHERE extract (month from regdate)=#{month}
+	GROUP BY teammember_id, extract (month from regdate)
+  </select>
+  
+</mapper>

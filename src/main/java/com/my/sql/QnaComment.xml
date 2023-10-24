@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.my.qna.QnaboardCommentMapper">
+
+	<!-- 댓글 작성 -->
+	<insert id="insertComment" parameterType="QnaBoardCommentDTO">
+		INSERT INTO ${tableName}(comment_no, qna_no, content, teammember_id)
+		VALUES (ADMIN.QNACOMMENT_NO${teamNo}_SEQ.NEXTVAL, #{qna_no}, #{content}, #{teammember_id})
+  	</insert>
+  
+  	<!-- 대댓글 작성 -->
+  	<insert id="insertReplyComment" parameterType="QnaBoardCommentDTO">
+		INSERT INTO ${tableName}(comment_no, qna_no, comment_group, content, teammember_id)
+		VALUES (ADMIN.QNACOMMENT_NO${teamNo}_SEQ.NEXTVAL, #{qna_no}, #{commentGroup}, #{content}, #{teammember_id})
+  	</insert>
+
+	<!-- 댓글과 대댓글 모두 조회 -->
+	<select id="selectCommentByQnaNo" resultType="QnaBoardCommentDTO" parameterType = "hashmap">
+
+		SELECT level, a.*
+		FROM ${tableName} a
+        WHERE QNA_NO=#{qnaNo}
+		START WITH comment_group IS NULL
+		CONNECT BY PRIOR comment_no = comment_group
+		ORDER SIBLINGS BY comment_no  ASC		
+		
+	</select>
+	
+	<!-- 댓글 채택 -->
+	<update id="commentPick">
+		UPDATE ${tableName}
+		SET pickeddate = sysdate
+		WHERE qna_no = #{qnaNo} AND comment_no = #{commentNo}
+	</update>
+	
+	<!-- 댓글 수정 -->
+	<update id="update" parameterType="QnaBoardDTO">
+			UPDATE ${tableName}
+			SET content = #{content, jdbcType=VARCHAR}, regdate = sysdate
+			WHERE qna_no = #{qnaNo} AND comment_no = #{commentNo}
+	</update>
+	
+	<!-- 댓글 삭제 -->
+	<update id="delete" parameterType="hashmap">
+			UPDATE ${tableName}
+			SET comment_status = 0
+			WHERE qna_no = #{qnaNo} AND comment_no = #{commentNo}
+	</update>
+  
+</mapper>

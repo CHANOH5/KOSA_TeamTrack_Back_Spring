@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.my.team.TeamMapper">
+	<!-- 서현 -->
+	<select id="selectCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM TEAM
+	</select>
+	<select id="selectCountOfSelectHashtag"
+		resultType="java.lang.Integer" parameterType="String">
+		SELECT COUNT(*) FROM
+		(SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		team_no IN
+		(SELECT team_no
+		FROM team_hashtag
+		WHERE hashtag_name = #{data})) c))
+	</select>
+	<select id="selectCountOfSelectDate"
+		resultType="java.lang.Integer" parameterType="java.util.HashMap">
+		SELECT COUNT(*) FROM (SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		(TO_DATE(startdate, 'YYYY-MM-DD') <![CDATA[>=]]>
+		TO_DATE(#{startDate}, 'YYYY-MM-DD')) AND (TO_DATE(enddate,
+		'YYYY-MM-DD') <![CDATA[<=]]>
+		TO_DATE(#{endDate}, 'YYYY-MM-DD'))
+		ORDER BY ${column} DESC) c))
+	</select>
+	<select id="selectCountOfSelectData"
+		resultType="java.lang.Integer" parameterType="java.util.HashMap">
+		SELECT COUNT(*) FROM
+		(SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		team_no IN
+		(SELECT team_no
+		FROM ${table}
+		WHERE ${column} LIKE
+		'%'||#{data}||'%')) c))
+	</select>
+	<!-- 확인 필요 -->
+	<select id="selectByTeamNo" resultType="TeamDTO">
+		SELECT *
+		FROM TEAM a
+		WHERE
+		team_no = ${teamNo}
+	</select>
+	<select id="selectByTeamName" resultType="Integer">
+		SELECT team_no
+		FROM TEAM
+		WHERE team_name = #{teamName}
+	</select>
+	<!-- 확인 필요 -->
+	<select id="selectHashtag" resultType="TeamDTO"
+		parameterType="java.util.HashMap">
+		SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		team_no IN
+		(SELECT team_no FROM team_hashtag
+		WHERE hashtag_name =
+		#{data})) c)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+	<select id="selectByData" resultType="TeamDTO"
+		parameterType="java.util.HashMap">
+		SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		team_no IN
+		(SELECT team_no FROM ${table}
+		WHERE ${column} LIKE
+		'%'||#{data}||'%')) c)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+	<select id="selectByCondition" resultType="TeamDTO"
+		parameterType="java.util.HashMap">
+		SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		TO_DATE(enddate, 'YYYY-MM-DD') > sysdate
+		ORDER BY ${column} DESC)
+		c)
+		WHERE rn BETWEEN #{start}AND #{end}
+	</select>
+	<select id="selectByDate" resultType="TeamDTO"
+		parameterType="java.util.HashMap">
+		SELECT * FROM (SELECT rownum rn, c.* FROM(SELECT *
+		FROM TEAM a
+		WHERE
+		(TO_DATE(startdate,
+		'YYYY-MM-DD') <![CDATA[>=]]>
+		TO_DATE(#{startDate}, 'YYYY-MM-DD')) AND (TO_DATE(enddate,
+		'YYYY-MM-DD') <![CDATA[<=]]>
+		TO_DATE(#{endDate}, 'YYYY-MM-DD'))
+		ORDER BY ${column} DESC) c)
+		WHERE rn
+		BETWEEN #{start}AND #{end}
+	</select>
+	<select id="createTeam" statementType="CALLABLE"
+		parameterType="hashMap">
+		{call CREATE_TEAM(
+		#{I_TEAM_NAME, mode=IN, jdbcType=VARCHAR},
+		#{I_LEADER_ID, mode=IN, jdbcType=VARCHAR},
+		#{I_STUDY_TYPE, mode=IN, jdbcType=VARCHAR},
+		#{I_ONOFFLINE, mode=IN, jdbcType=VARCHAR},
+		#{I_MAX_MEMBER, mode=IN, jdbcType=INTEGER},
+		#{I_STARTDATE, mode=IN, jdbcType=VARCHAR},
+		#{I_ENDDATE, mode=IN, jdbcType=VARCHAR},
+		#{I_BRIEF_INFO, mode=IN, jdbcType=VARCHAR},
+		#{I_TEAM_INFO, mode=IN, jdbcType=VARCHAR},
+		#{I_HASHTAG_NAME1, mode=IN, jdbcType=VARCHAR},
+		#{I_HASHTAG_NAME2, mode=IN, jdbcType=VARCHAR},
+		#{I_HASHTAG_NAME3, mode=IN, jdbcType=VARCHAR},
+		#{I_HASHTAG_NAME4, mode=IN, jdbcType=VARCHAR},
+		#{I_HASHTAG_NAME5, mode=IN, jdbcType=VARCHAR}
+		)
+		}
+	</select>
+	<update id="updateTeam" parameterType="TeamDTO">
+		UPDATE TEAM
+		SET team_name =
+		#{teamName},
+		study_type = #{studyType},
+		onoffline = #{onOffLine},
+		max_member = #{maxMember},
+		startdate = #{startDate},
+		enddate =
+		#{endDate},
+		brief_info = #{briefInfo},
+		team_info = #{teamInfo}
+		WHERE
+		team_no = #{teamNo}
+	</update>
+	<delete id="deleteTeam" statementType="CALLABLE"
+		parameterType="int">
+		{call DELETE_TEAM(
+		#{I_TEAM_NO, mode=IN,
+		jdbcType=INTEGER}
+		)
+		}
+	</delete>
+	<select id="selectTeamHashtag" resultType="TeamHashtagDTO"
+		parameterType="int">
+		SELECT * FROM TEAM_HASHTAG
+		WHERE team_no = ${teamNo}
+	</select>
+	<delete id="deleteHashtag" parameterType="int">
+		DELETE FROM
+		TEAM_HASHTAG
+		WHERE team_no = ${teamNo}
+	</delete>
+	<update id="insertHashtag" parameterType="java.util.Map">
+		<foreach collection="list" item="item" separator=" "
+			open="INSERT ALL" close="SELECT * FROM DUAL">
+			INTO TEAM_HASHTAG(hashtag_name, team_no)
+			VALUES (#{item.hashtag}, ${item.teamNo})
+		</foreach>
+	</update>
+	<!-- 
+	<update id="updateViewCnt" parameterType="int">
+		UPDATE TEAM
+		SET viewcnt
+		= viewcnt + 1
+		WHERE team_no = ${teamNo}
+	</update>
+	 -->
+	
+	<!-- 워니 침입 : 리더 확인 쿼리 -->
+	<select id="selectLeaderId" resultType = "String" parameterType="Integer">
+		SELECT leader_id
+		FROM TEAM
+		WHERE team_no = #{teamNo}
+	</select>
+
+	<select id="selectMyTeam" resultType="SignupTeamDTO"
+		parameterType="hashmap">
+		SELECT * FROM (SELECT rownum rn, c.*
+		FROM (SELECT a.team_no, b.team_name, a.status
+		FROM SIGNUP_TEAM a JOIN TEAM b ON (a.team_no = b.team_no)
+		WHERE a.id = #{id} AND (a.status=1 OR a.status=3) AND
+		TO_CHAR(SYSDATE,'YYYY-MM-DD') &lt; b.enddate
+		ORDER BY a.team_no DESC
+		) c
+		)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<select id="selectMyTeamCount" resultType="int"
+		parameterType="String">
+		SELECT COUNT(*)
+		FROM SIGNUP_TEAM a JOIN TEAM b ON
+		(a.team_no = b.team_no)
+		WHERE a.id = #{id} AND (a.status=1 OR
+		a.status=3) AND TO_CHAR(SYSDATE,'YYYY-MM-DD') &lt; b.enddate
+	</select>
+
+	<select id="selectEndTeam" resultType="SignupTeamDTO"
+		parameterType="hashmap">
+		SELECT * FROM (SELECT rownum rn, c.*
+		FROM (SELECT a.team_no, b.team_name, a.status
+		FROM SIGNUP_TEAM a JOIN TEAM b ON (a.team_no = b.team_no)
+		WHERE a.id = #{id} AND (a.status=1 OR a.status=3) AND
+		TO_CHAR(SYSDATE,'YYYY-MM-DD') &gt; b.enddate
+		ORDER BY a.team_no DESC
+		) c
+		)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<select id="selectEndTeamCount" resultType="int"
+		parameterType="String">
+		SELECT COUNT(*)
+		FROM SIGNUP_TEAM a JOIN TEAM b ON
+		(a.team_no = b.team_no)
+		WHERE a.id = #{id} AND (a.status=1 OR
+		a.status=3) AND TO_CHAR(SYSDATE,'YYYY-MM-DD') &gt; b.enddate
+	</select>
+
+	<select id="selectWaitingTeam" resultType="SignupTeamDTO"
+		parameterType="hashmap">
+		SELECT * FROM (SELECT rownum rn, c.*
+		FROM (SELECT a.team_no, b.team_name
+		FROM SIGNUP_TEAM a JOIN TEAM b
+		ON (a.team_no = b.team_no)
+		WHERE a.id = #{id} AND a.status=#{status}
+		) c
+		)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<select id="selectWaitingTeamCount" resultType="int"
+		parameterType="hashmap">
+		SELECT COUNT(*)
+		FROM SIGNUP_TEAM a JOIN TEAM b ON
+		(a.team_no = b.team_no)
+		WHERE a.id = #{id} AND a.status=#{status}
+	</select>
+
+	<select id="selectTeamMember" resultType="TeamMemberDTO"
+		parameterType="hashmap">
+		SELECT a.*, b.nickname
+		FROM ${tableName} a JOIN CUSTOMER
+		b ON (a.id=b.id)
+		WHERE a.id = #{id} AND a.status=1
+	</select>
+
+	<delete id="deleteSignupTeamByTeamNo" parameterType="hashmap">
+		DELETE FROM
+		SIGNUP_TEAM
+		WHERE id = #{id} AND team_no = #{teamNo}
+	</delete>
+	
+	<select id="selectSignupTeam" resultType = "SignupTeamDTO" parameterType="String">
+		SELECT *
+		FROM SIGNUP_TEAM
+		WHERE id=#{id}
+	</select>
+	
+	<!-- ###################################################################################################################### -->
+
+	<!-- 셍나 -->
+
+	<!-- 멤버인지 아닌지 확인 -->
+	<select id="selectTeamMemberStatus" parameterType="hashmap"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM TEAMMEMBER_${teamNo}
+		WHERE ID = #{id} AND STATUS <![CDATA[ = 1 ]]>
+	</select>
+
+	<!-- 팀 메인_팀 소개글 가져오기 -->
+	<select id="selectTeamInfoByTeamNo" parameterType="int"
+		resultType="String">
+		SELECT team_info
+		FROM TEAM
+		WHERE team_No = #{team_No}
+	</select>
+
+	<!-- 팀 메인_공지사항 가져오기 -->
+	<select id="selectNoticeListByNoticeNo" parameterType="int"
+		resultType="NoticeDTO">
+		SELECT notice_no, notice_title, notice_content, regdate
+		FROM (
+		SELECT notice_no, notice_title, notice_content, regdate
+		FROM NOTICEBOARD_${teamNo}
+		ORDER BY main_status DESC, regdate DESC)
+		WHERE ROWNUM  <![CDATA[ <= 3 ]]>
+	</select>
+
+	<!-- 팀 메인_팀 정보 가져오기 -->
+	<select id="selectAllTeamInfo" parameterType="int"
+		resultType="TeamDTO">
+		SELECT *
+		FROM TEAM
+		WHERE TEAM_NO = ${teamNo}
+	</select>
+
+	<!-- 팀 관리_팀 가입 버튼 누를 때 방출 회원인지 아닌지 판단 -->
+	<select id="selectAllTeammember" resultType="Integer" parameterType="java.util.Map">
+		SELECT STATUS
+		FROM TEAMMEMBER_${teamNo}
+		WHERE ID = #{id}
+	</select>
+
+	<!-- 팀 메인_팀 가입하기 -->
+	<insert id="insertIntoSignupTeam" parameterType="SignupTeamDTO">
+		INSERT INTO
+		SIGNUP_TEAM (team_no, id, status, introduction)
+		VALUES (#{teamNo},
+		#{id}, 0, #{introduction})
+	</insert>
+
+	<!-- 팀 메인_팀 나가기1 -->
+	<update id="updateTeamMemberStatusResign"
+		parameterType="java.util.Map">
+		UPDATE TEAMMEMBER_${teamNo}
+		SET STATUS <![CDATA[ = 0 ]]>
+		WHERE ID = #{id}
+	</update>
+
+	<!-- 팀 메인_팀 나가기2 -->
+	<delete id="deleteSignupTeam" parameterType="String">
+		DELETE FROM
+		SIGNUP_TEAM
+		WHERE ID = #{id} AND team_no=${teamNo}
+	</delete>
+
+	<!-- 팀 메인_팀 멤버 닉네임 보여주기 -->
+	<select id="selectNicknameByTeamNo" parameterType="int" resultType="String">
+        SELECT NICKNAME
+        FROM TEAMMEMBER_${teamNo}
+        WHERE STATUS <![CDATA[ = 1 ]]>
+    </select>
+    
+    <!-- 팀 메인_조회수 증가 -->
+    <update id="updateViewCnt" parameterType="int">
+	    UPDATE TEAM
+	    SET VIEWCNT = VIEWCNT + 1
+	    WHERE TEAM_NO = #{teamNo}
+	</update>
+
+	<!-- 팀 메인_조회수 출력 -->
+	<select id="selectViewCnt" parameterType="int" resultType="int">
+		SELECT VIEWCNT
+		FROM TEAM
+		WHERE TEAM_NO = #{teamNo}
+	</select>
+
+	<!-- 팀 출석부_출석여부확인 -->
+	<select id="selectAttendanceDate" parameterType="java.util.Map"
+		resultType="String">
+		SELECT ATTENDANCE_DATE
+		FROM ATTENDANCE_${teamNo}
+		WHERE
+		TO_CHAR(ATTENDANCE_DATE, 'YY/MM/DD') = TO_CHAR(SYSDATE, 'YY/MM/DD')AND
+		id = #{id}
+	</select>
+
+	<!-- 팀 출석부_출석하기 -->
+	<insert id="insertAttendanceById" parameterType="java.util.Map">
+		INSERT INTO ATTENDANCE_${teamNo} (ATTENDANCE_DATE, ID)
+		VALUES (SYSDATE, #{id})
+	</insert>
+	
+	<!-- 팀 출석부_팀 멤버 테이블에도 출석수 추가해주기 -->
+	<update id="updateAttendanceCnt" parameterType="java.util.Map">
+		UPDATE TEAMMEMBER_${teamNo}
+		SET ATTENDANCE = NVL(ATTENDANCE, 0) <![CDATA[ + 1 ]]>
+		WHERE ID = #{id}
+	</update>
+
+	<!-- 팀 출석부_출석부 조회 -->
+	<select id="selectAttendanceById" resultType="AttendanceDTO"
+		parameterType="java.util.Map">
+		SELECT ATTENDANCE_DATE, ID
+		FROM ATTENDANCE_${teamNo}
+		WHERE ID = #{id} AND ROWNUM <![CDATA[ <= 20 ]]>
+		ORDER BY ATTENDANCE_DATE DESC
+	</select>
+
+	<!-- 팀 관리_현재 팀원 조회 -->
+	<select id="selectMemberInfo" resultType="java.util.Map"
+		parameterType="int">
+		SELECT c.NICKNAME, st.ID, st.INTRODUCTION, st.status
+		FROM CUSTOMER c JOIN SIGNUP_TEAM st ON (c.id = st.id)
+		WHERE st.TEAM_NO
+		= ${teamNo} AND (st.STATUS = 3 OR st.STATUS = 1)
+	</select>
+	
+	<!-- 팀 관리_현재 팀원 조회(팀장은 안보이게) -->
+	<select id="selectTeamMemberInfo" resultType="java.util.Map"
+		parameterType="int">
+		SELECT c.NICKNAME, st.ID, st.status
+		FROM CUSTOMER c JOIN SIGNUP_TEAM st ON (c.id = st.id)
+		WHERE st.TEAM_NO = ${teamNo} AND st.STATUS = 1
+	</select>
+
+	<!-- 팀 관리_팀원 방출 -->
+	<update id="updateTeamMemberStatusDismiss"
+		parameterType="java.util.Map">
+		UPDATE TEAMMEMBER_${teamNo}
+		SET STATUS = 2
+		WHERE ID = #{id}
+	</update>
+	
+	<!-- 팀 관리_팀원 방출 이후 가입한 팀에서 제거 -->
+	<delete id="deleteTeamMemberInSignupTeam" parameterType="java.util.Map" >
+		DELETE 
+		FROM SIGNUP_TEAM
+		WHERE ID = #{id} AND TEAM_NO = #{teamNo}
+	</delete>
+	
+	<!-- 팀 관리_팀 가입 요청 확인 -->
+	<select id="selectRequestInfo" resultType="java.util.Map"
+		parameterType="int">
+		SELECT st.ID, st.INTRODUCTION, st.STATUS, c.NICKNAME
+		FROM CUSTOMER c JOIN
+		SIGNUP_TEAM st ON (c.id = st.id)
+		WHERE st.STATUS = 0 And TEAM_NO =
+		${teamNo}
+	</select>
+	
+	<!-- 가입 요청 전에 방출/탈퇴/가입중 판별 -->
+	<select id="selectLeaveTeamMemberStatus" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT STATUS
+	    FROM TEAMMEMBER_${teamNo}
+	    WHERE ID = #{id}
+	</select>
+	
+	<!-- 탈퇴 멤버용 업데이트 -->
+	<update id="updateMemberStatus" parameterType="java.util.Map">
+	    UPDATE TEAMMEMBER_${teamNo}
+	    SET STATUS = 1
+	    WHERE ID = #{id}
+	</update>
+
+	<!-- 팀 관리_팀 가입 요청 승인1 -->
+	<update id="updateRequestInfoApprove"
+		parameterType="java.util.Map">
+		UPDATE SIGNUP_TEAM
+		SET STATUS = 1
+		WHERE TEAM_NO = #{teamNo} AND ID = #{id}
+	</update>
+
+	<!-- 팀 관리_팀 가입 요청 승인2 -->
+	<insert id="insertRequestInfoApprove"
+		parameterType="java.util.Map">
+		INSERT INTO TEAMMEMBER_${teamNo} (ID, NICKNAME, JOIN_DATE, STATUS)
+		SELECT C.ID, C.NICKNAME, SYSDATE, 1
+		FROM CUSTOMER C
+		WHERE C.ID = #{id}
+	</insert>
+
+	<!-- 팀 관리_팀 가입 요청 거절 -->
+	<update id="updateRequestInfoReject"
+		parameterType="java.util.Map">
+		UPDATE SIGNUP_TEAM
+		SET STATUS = 2
+		WHERE TEAM_NO = #{teamNo} AND ID = #{id}
+	</update>
+
+	<!-- 팀 관리_과제 출제자 선정 -->
+	<insert id="insertExaminer" parameterType="hashmap">
+		INSERT INTO TASK_${teamNo} (TASK_NO, ID, DUEDATE1, DUEDATE2, ENDDATE)
+		VALUES
+		(TASK_${teamNo}_SEQ.NEXTVAL ,#{TaskDTO.id}, #{TaskDTO.duedate1},
+		#{TaskDTO.duedate2}, #{TaskDTO.enddate})
+	</insert>
+	
+	<!-- 팀 관리_과제 출제자 조회 -->
+	<select id="selectExaminer" parameterType="hashmap" resultType="java.util.Map">
+	    SELECT TASK_NO, ID, DUEDATE1, DUEDATE2
+	    FROM TASK_${teamNo}
+	</select>
+	
+	<!-- 과제 출제자 조회 (20개 리밋) -->
+	<!-- 
+	<select id="selectExaminer" parameterType="hashmap" resultType="yourResultType">
+	    SELECT TASK_NO, ID, DUEDATE1, DUEDATE2
+	    FROM (
+	        SELECT TASK_NO, ID, DUEDATE1, DUEDATE2
+	        FROM TASK_${teamNo}
+	        ORDER BY TASK_NO DESC
+	    ) WHERE ROWNUM <= 20
+	</select>
+	 -->
+
+</mapper>

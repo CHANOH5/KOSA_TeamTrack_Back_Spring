@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.my.notice.NoticeMapper">
+  <select id="selectNoticeAll" resultType="NoticeDTO" parameterType = "hashmap">
+	SELECT * FROM (SELECT rownum rn, a.*
+     FROM (SELECT *
+       FROM ${tableName}
+         ORDER BY notice_no DESC
+         ) a
+      )
+  WHERE rn BETWEEN #{start} AND #{end}
+  </select>
+  <select id="selectNoticeCount" resultType="Integer" parameterType = "String">
+	SELECT COUNT(*)
+	FROM ${tableName}
+  </select>
+  <select id="selectByNoticeNo" resultType="NoticeDTO" parameterType = "hashmap">
+	SELECT *
+	FROM ${tableName}
+	WHERE notice_no = #{noticeNo}
+  </select>
+  <insert id="insertNotice" parameterType = "hashmap">
+	INSERT INTO NOTICEBOARD_${teamNo} (notice_no, notice_title, notice_content, regdate, main_status)
+	VALUES (NOTICE_${teamNo}_SEQ.NEXTVAL, #{notice.noticeTitle}, #{notice.noticeContent}, #{notice.regDate}, #{notice.mainStatus})
+  	<selectKey keyProperty="notice.noticeNo" resultType = "Integer" order="AFTER">
+  		SELECT NOTICE_${teamNo}_SEQ.CURRVAL FROM DUAL
+  	</selectKey>
+  </insert>
+  <delete id="deleteNotice" parameterType = "hashmap">
+  	DELETE FROM ${tableName}
+	WHERE notice_no = #{noticeNo}
+  </delete>
+  <update id="updateNotice" parameterType = "hashmap">
+  	UPDATE ${tableName}
+	SET notice_title = #{notice.noticeTitle}, notice_content = #{notice.noticeContent}, main_status = #{notice.mainStatus}
+	WHERE notice_no = #{notice.noticeNo}
+  </update>
+  <select id="selectMainNotice" resultType="NoticeDTO" parameterType = "String">
+	SELECT *
+	FROM ${tableName}
+	WHERE main_status = 1
+  </select>
+  <update id="updateMainStatus" parameterType = "hashmap">
+  	UPDATE ${tableName}
+	SET main_status = #{mainStatus}
+	WHERE notice_no = #{noticeNo}
+  </update>
+</mapper>

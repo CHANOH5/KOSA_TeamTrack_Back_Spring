@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <!-- <setting name="logImpl" value="STDOUT_LOGGING"/>-->
+  </settings>
+
+  <typeAliases>
+
+   <typeAlias type="com.my.rank.dto.RankDTO" alias="RankDTO"/>
+   <typeAlias type="com.my.notice.dto.NoticeDTO" alias="NoticeDTO"/>
+   <typeAlias type="com.my.customer.dto.CustomerDTO" alias="CustomerDTO"/>
+   <typeAlias type="com.my.team.dto.TeamDTO" alias="TeamDTO"/>
+   <typeAlias type="com.my.team.dto.TeamHashtagDTO" alias="TeamHashtagDTO"/>
+   <typeAlias type="com.my.team.dto.AttendanceDTO" alias="AttendanceDTO"/>
+   <typeAlias type="com.my.team.dto.SignupTeamDTO" alias="SignupTeamDTO"/>
+   <typeAlias type="com.my.team.dto.TeamMemberDTO" alias="TeamMemberDTO"/>
+   <typeAlias type="com.my.task.dto.TaskDTO" alias="TaskDTO"/>
+   <typeAlias type="com.my.task.dto.MemberTaskDTO" alias="MemberTaskDTO"/>
+   <typeAlias type="com.my.qna.dto.QnaBoardDTO" alias="QnaBoardDTO"/>
+   <typeAlias type="com.my.qna.dto.QnaBoardCommentDTO" alias="QnaBoardCommentDTO"/>
+  </typeAliases>
+
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.OracleDriver"/>
+        <!-- window -->
+        <property name="url" value="jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX"/>
+    
+        <!-- mac경로임
+        <property name="url" value="jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=/Users/opt/OracleCloudWallet/VFX"/> -->
+        
+        <property name="username" value="admin"/>
+        <property name="password" value="Kosaproject2023"/>
+      </dataSource>
+    </environment>
+  </environments>
+
+  <mappers>
+
+   <mapper resource="com/my/sql/Rank.xml"/>
+   <mapper resource="com/my/sql/Notice.xml"/>
+   <mapper resource="com/my/sql/Customer.xml"/>
+   <mapper resource="com/my/sql/Team.xml"/>
+   <mapper resource="com/my/sql/Task.xml"/>
+   <mapper resource="com/my/sql/Qna.xml"/>
+   <mapper resource="com/my/sql/QnaComment.xml"/>
+  </mappers>
+
+</configuration>

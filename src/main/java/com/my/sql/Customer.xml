@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.my.customer.CustomerMapper">
+
+	<!-- 회원가입 -->
+  <insert id="create" parameterType="CustomerDTO">
+	INSERT INTO customer(id, pwd, nickname, name, birthday, phone, email)
+	VALUES(#{id, jdbcType=VARCHAR}, #{pwd, jdbcType=VARCHAR}, #{nickname, jdbcType=VARCHAR},
+	 		#{name, jdbcType=VARCHAR}, #{birthday, jdbcType=VARCHAR},
+	  		#{phone, jdbcType=VARCHAR}, #{email, jdbcType=VARCHAR})
+  </insert>
+  
+  	<!-- 회원조회, 아이디 중복확인 -->
+  <select id="selectById" resultType="CustomerDTO">
+  	SELECT *
+  	FROM customer
+  	WHERE id=#{id}
+  </select>
+  
+  <!-- 원희 -->
+  <select id="selectByNickname" resultType="CustomerDTO">
+  	SELECT *
+  	FROM customer
+  	WHERE nickname=#{nickname}
+  </select>
+  
+  <update id="updateNickname" parameterType = "hashmap">
+  	UPDATE CUSTOMER
+	SET nickname = #{nickname}
+	WHERE id = #{id}
+  </update>
+  
+  <update id="updateCustomerAll" parameterType = "hashmap">
+  	UPDATE CUSTOMER
+	SET name = #{customer.name}, birthday = #{customer.birthday}, phone = #{customer.phone}, email = #{customer.email}
+	WHERE id = #{id}
+  </update>
+  
+  <update id="updateCustomerStatus" parameterType="String">
+  	UPDATE CUSTOMER
+	SET status = 0
+	WHERE id = #{id}
+  </update>
+  
+  <update id="updatePwd" parameterType="hashmap">
+  	UPDATE CUSTOMER
+	SET pwd = #{pwd}
+	WHERE id = #{id}
+  </update>
+</mapper>
