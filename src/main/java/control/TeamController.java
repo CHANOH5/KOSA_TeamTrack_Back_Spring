@@ -32,6 +32,7 @@ public class TeamController {
 	
 	@Autowired protected TeamServiceImpl service;
 	@Autowired protected RankServiceImpl rankservice;
+	
 	@Autowired protected SignupTeamDTO signupTeamDTO;
 	@Autowired protected AttendanceDTO attendanceDTO;
 	@Autowired protected TeamDTO teamDTO;
@@ -49,7 +50,7 @@ public class TeamController {
 	
 	
 	/* 셍나 */
-	@GetMapping("/main")
+	@GetMapping("/teammain")
 	public Map teamMain(int teamNo, String id) {
 
 		Map<String, Object> methodMap = new HashMap<>();
@@ -322,7 +323,7 @@ public class TeamController {
 
 	} // teamDismiss()
 	
-	@GetMapping("/selectexaminer")
+	@GetMapping("/teamselectexaminer")
 	public Map selectExaminer(int teamNo, String id, String action, String duedate1, String duedate2, String enddate) {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
