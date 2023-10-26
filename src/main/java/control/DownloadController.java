@@ -4,52 +4,55 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-public class DownloadController implements Controller {
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-//		response.setHeader("Access-Control-Allow-Origin", "http://192.168.1.20:5500");
-//		response.setHeader("Access-Control-Allow-Credentials", "true");
-		//text/html, application/json
-		response.setContentType("application/octet-stream;charset=UTF-8");
-//		PrintWriter out = response.getWriter();
-		ServletOutputStream sos = response.getOutputStream();
-		
-		String teamNo = request.getParameter("teamNo");
-		String opt = request.getParameter("opt");
+public class DownloadController {
+
+	@GetMapping("/download")
+	@ResponseBody
+	public ResponseEntity<?> download(String teamNo, String opt) throws IOException{
 		String attachesDir = "C:\\KOSA202307\\attaches";
+		File dir = new File(attachesDir);
+		
 		String fileName;
 		if(opt.equals("profile")) {
-			fileName = teamNo + "_profile";
+			opt+="_t"; //썸네일 파일
+			fileName = teamNo + "_"+ opt;
 		}else {
-			fileName = teamNo + "_" + opt + "_";
+			fileName = teamNo + "_"+ opt +"_";
 		}
-		File dir = new File(attachesDir);
-		for(File file: dir.listFiles()){
-			String existFileName = file.getName();
+		
+		for(File f: dir.listFiles()) {
+			String existFileName = f.getName();
 			if(existFileName.startsWith(fileName)) {
-				System.out.println(existFileName+"파일입니다. 파일크기:" + file.length());
-				response.setHeader("Content-Disposition",
-						"attachment;filename=" + URLEncoder.encode(existFileName, "UTF-8"));
+		
+				HttpStatus status = HttpStatus.OK;
+				HttpHeaders headers = new HttpHeaders();
+				headers.add(HttpHeaders.CONTENT_DISPOSITION,
+						    "attachment;filename=" + URLEncoder.encode(existFileName, "UTF-8"));
 				
-				FileInputStream fis = new FileInputStream(file);
-				int readValue = -1;
-				while((readValue = fis.read()) != -1) {
-					sos.write(readValue);
-				}
-				sos.close();
-				return null;
+				System.out.println("in download file: " + f + ", file size:" + f.length());
+				String contentType = Files.probeContentType(f.toPath());//파일의 형식		
+				headers.add(HttpHeaders.CONTENT_TYPE, contentType); //응답형식		
+				headers.add(HttpHeaders.CONTENT_LENGTH, ""+f.length());//응답길이
+				
+				byte[]bArr = FileCopyUtils.copyToByteArray(f);
+				ResponseEntity<?> entity = new ResponseEntity<>(bArr, headers, status);//응답상태코드
+				return entity;
 			}
 		}
-		System.out.println(teamNo + "의 프로필 파일이 없습니다");
-		return null;
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		ResponseEntity<?> entity = new ResponseEntity<>("프로필썸네일파일이 없습니다", status);
+		return entity;
+		
 	}
-
 }
