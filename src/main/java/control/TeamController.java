@@ -51,7 +51,7 @@ public class TeamController {
 	
 	/* 셍나 */
 	@GetMapping("/teammain")
-	public Map teamMain(int teamNo, String id) {
+	public Map teamMain(int teamNo, String id) throws Exception {
 
 		Map<String, Object> methodMap = new HashMap<>();
 		Map<String, Object> statusMap = new HashMap<>();
@@ -100,7 +100,7 @@ public class TeamController {
 	} // teamMain()
 	
 	@GetMapping("/teamjoin")
-	public Map teamJoin(int teamNo, String id, String introduction, int teamMemberStatus) throws FindException {
+	public Map teamJoin(int teamNo, String id, String introduction, int teamMemberStatus) throws Exception {
 		
 		Map<String, Object> map = new HashMap<>();
 		
@@ -130,7 +130,7 @@ public class TeamController {
 	} // teamJoin()
 	
 	@GetMapping("/teamleave")
-	public Map teamLeave(int teamNo, String id) throws RemoveException {
+	public Map teamLeave(int teamNo, String id) throws Exception {
 		
 		Map<String, Object> map = new HashMap<>();
 		
@@ -213,7 +213,7 @@ public class TeamController {
 	} // teamAttendance()
 	
 	@GetMapping("/teamreqaccept")
-	public Map teamReqAccept(int teamNo, String id, String action) {
+	public Map teamReqAccept(int teamNo, String id, String action) throws Exception {
 
       Map paramsMap = new HashMap<>();
       Map statusMap = new HashMap<>(); 
@@ -281,7 +281,7 @@ public class TeamController {
 	} // teamReqAccept()
 	
 	@GetMapping("/teamdismiss")
-	public Map teamDismiss(int teamNo, String id, String action) {
+	public Map teamDismiss(int teamNo, String id, String action) throws Exception {
 
       Map paramsMap = new HashMap<>();
       Map statusMap = new HashMap<>(); 
@@ -324,7 +324,8 @@ public class TeamController {
 	} // teamDismiss()
 	
 	@GetMapping("/teamselectexaminer")
-	public Map selectExaminer(int teamNo, String id, String action, String duedate1, String duedate2, String enddate) {
+	public Map selectExaminer(int teamNo, String id, String action, String duedate1, String duedate2, String enddate) 
+			throws Exception {
 
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -406,6 +407,5 @@ public class TeamController {
 		return resultMap;
 		
 	} // selectExaminer()
-	
 	
 } // end class
