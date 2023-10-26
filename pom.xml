@@ -47,7 +47,6 @@
 		</dependency>
 		
 		<!-- Oracle -->
-
 		<dependency>
 		    <groupId>com.oracle.database.security</groupId>
 		    <artifactId>oraclepki</artifactId>
