@@ -43,14 +43,13 @@
   </environments>
 
   <mappers>
-
-   <mapper resource="com/my/sql/Rank.xml"/>
-   <mapper resource="com/my/sql/Notice.xml"/>
-   <mapper resource="com/my/sql/Customer.xml"/>
-   <mapper resource="com/my/sql/Team.xml"/>
-   <mapper resource="com/my/sql/Task.xml"/>
-   <mapper resource="com/my/sql/Qna.xml"/>
-   <mapper resource="com/my/sql/QnaComment.xml"/>
+   <mapper resource="Rank.xml"/>
+   <mapper resource="Notice.xml"/>
+   <mapper resource="Customer.xml"/>
+   <mapper resource="Team.xml"/>
+   <mapper resource="Task.xml"/>
+   <mapper resource="Qna.xml"/>
+   <mapper resource="QnaComment.xml"/>
   </mappers>
 
 </configuration>
