@@ -1,3 +1,4 @@
+/*
 package control;
 
 import java.io.IOException;
@@ -59,3 +60,4 @@ public class TeamLeaveController extends TeamController {
 	} // execute()
 
 } // end class
+*/
