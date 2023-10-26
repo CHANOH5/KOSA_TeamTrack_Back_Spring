@@ -26,27 +26,31 @@ import com.zaxxer.hikari.HikariDataSource;
 @EnableTransactionManagement
 public class MyApplicationContext {
 
-	@Bean
-	public SimpleDriverDataSource dataSource() {
-		SimpleDriverDataSource sdds = new SimpleDriverDataSource();
-		
-		sdds.setDriverClass(oracle.jdbc.OracleDriver.class);
-		sdds.setUrl("jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
-		sdds.setUsername("admin");
-		sdds.setPassword("Kosaproject2023");
-		
-		return sdds;
-		
-	} // SimpleDriverDataSource()
+//	@Bean
+//	public SimpleDriverDataSource dataSource() {
+//		SimpleDriverDataSource sdds = new SimpleDriverDataSource();
+//		
+//		sdds.setDriverClass(oracle.jdbc.OracleDriver.class);
+////		sdds.setUrl("jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
+//		
+//		sdds.setUsername("admin");
+//		sdds.setPassword("Kosaproject2023");
+//		
+//		return sdds;
+//		
+//	} // SimpleDriverDataSource()
 	
 	@Bean
 	public HikariConfig hikariConfig() {
 		HikariConfig config = new HikariConfig();
 		
 		config.setDriverClassName("net.sf.log4jdbc.sql.jdbcapi.DriverSpy");
-		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
-		config.setUsername("admin");
-		config.setPassword("Kosaproject2023");
+//		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
+		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@localhost:1521:xe");
+//		config.setUsername("admin");
+		config.setUsername("hr");
+//		config.setPassword("Kosaproject2023");
+		config.setPassword("hr");
 		config.setMinimumIdle(3);
 		
 		return config;
