@@ -20,7 +20,10 @@ import lombok.Setter;
 
 
 @Repository
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerDAOImpl implements CustomerDAO {
 
 	@Autowired
