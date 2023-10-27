@@ -2,6 +2,9 @@ package com.my.notice.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.my.exception.AddException;
 import com.my.exception.FindException;
 import com.my.exception.ModifyException;
@@ -11,15 +14,16 @@ import com.my.notice.dao.NoticeDAOImpl;
 import com.my.notice.dto.NoticeDTO;
 import com.my.util.PageGroup;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Service(value="noticeService")
+@Setter @Getter @NoArgsConstructor @AllArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
+	@Autowired
 	private NoticeDAO noticeDAO;
-	private static NoticeServiceImpl service = new NoticeServiceImpl();
-	private NoticeServiceImpl() {
-		noticeDAO = new NoticeDAOImpl();
-	}
-	public static NoticeServiceImpl getInstance() {
-		return service;
-	}
 
 	@Override
 	public PageGroup<NoticeDTO> findNoticeAll(int currentPage, Integer teamNo) throws FindException{
