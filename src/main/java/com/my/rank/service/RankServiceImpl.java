@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.my.exception.AddException;
 import com.my.exception.FindException;
 import com.my.exception.ModifyException;
@@ -17,16 +20,20 @@ import com.my.task.dto.TaskDTO;
 import com.my.team.dto.AttendanceDTO;
 import com.my.team.dto.TeamMemberDTO;
 
+@Service
 public class RankServiceImpl implements RankService {
 	
+	@Autowired
 	private RankDAO rankDao;
-	private static RankServiceImpl service = new RankServiceImpl();
-	public RankServiceImpl() {
-		rankDao = new RankDAOImpl();
-	}
-	public static RankServiceImpl getInstance() {
-		return service;
-	}
+	
+//	private static RankServiceImpl service = new RankServiceImpl();
+//	
+//	public RankServiceImpl() {
+//		rankDao = new RankDAOImpl();
+//	}
+//	public static RankServiceImpl getInstance() {
+//		return service;
+//	}
 	
 	@Override
 	public List<RankDTO> findByMonth(Integer teamNo, Integer month) throws FindException {
