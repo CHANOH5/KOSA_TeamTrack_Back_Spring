@@ -1,5 +1,8 @@
 package control;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,10 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.my.exception.AddException;
@@ -26,8 +31,9 @@ import com.my.team.dto.SignupTeamDTO;
 import com.my.team.dto.TeamDTO;
 import com.my.team.dto.TeamHashtagDTO;
 import com.my.team.service.TeamServiceImpl;
-import com.my.util.Attach;
 import com.my.util.MainPageGroup;
+
+import net.coobird.thumbnailator.Thumbnailator;
 
 
 @RestController
@@ -57,7 +63,7 @@ public class TeamController {
 			if(teamName == "") {
 				map.put("status", 2);
 			}else {
-				map.put("status", 1);				
+				map.put("status", 1);            
 			}
 		}
 		System.out.println(map);
@@ -173,8 +179,8 @@ public class TeamController {
 
 	@GetMapping("/teamdelete")
 	public Map<String, Object> teamdelete(String gubun, int teamNo){
-		Map<String, Object> map = new HashMap<>();
 		if(gubun.equals("delete")) {
+			Map<String, Object> map = new HashMap<>();
 			try {
 				service.deleteTeam(teamNo);
 				//성공적으로 삭제한 경우
@@ -190,7 +196,8 @@ public class TeamController {
 		}else if(gubun.equals("select")) {
 
 			ObjectMapper mapper = new ObjectMapper();
-			//			HttpSession session = request.getSession();
+			//         HttpSession session = request.getSession();
+			Map<String, Object> map = new HashMap<>();
 			try {
 				TeamDTO team = new TeamDTO();
 				team = service.selectByTeamNo(teamNo);
@@ -209,159 +216,115 @@ public class TeamController {
 			System.out.println(map);
 			return map;
 		}
-		return map;
+		return null;
 	}
 
 	@PostMapping("/teammanage")
-	public Map<String, Object> teammanage(Attach attach) {
-		Map<String, Object> map = new HashMap<>();
-		try {
-			String gubun = attach.getParameter("gubun");
+	public Map<String, Object> teammanage(String gubun, TeamDTO team, List<TeamHashtagDTO> hashlist, MultipartFile f1){
 
-			if(gubun.equals("create")) {
-				HashMap<String, Object> param = new HashMap<>();
+		if(gubun.equals("create")) {
+			Map<String, Object> map = new HashMap<>();
+			HashMap<String, Object> param = new HashMap<>();
 
-				try {
+			try {
 
-					param.put("I_TEAM_NAME", attach.getParameter("teamName").trim());
-					param.put("I_LEADER_ID", attach.getParameter("leaderId").trim());
-					param.put("I_STUDY_TYPE", attach.getParameter("studyType").trim());
-					param.put("I_ONOFFLINE", attach.getParameter("onOffLine").trim());
-					param.put("I_MAX_MEMBER", attach.getParameter("maxMember").trim());
-					param.put("I_STARTDATE", attach.getParameter("startDate").trim());
-					param.put("I_ENDDATE", attach.getParameter("endDate").trim());
-					param.put("I_BRIEF_INFO", attach.getParameter("briefInfo").trim());
-					param.put("I_TEAM_INFO", attach.getParameter("teamInfo").trim());
-					param.put("I_HASHTAG_NAME1", attach.getParameter("hashtag1").trim());
-					param.put("I_HASHTAG_NAME2", attach.getParameter("hashtag2").trim());
-					param.put("I_HASHTAG_NAME3", attach.getParameter("hashtag3").trim());
-					param.put("I_HASHTAG_NAME4", attach.getParameter("hashtag4").trim());
-					param.put("I_HASHTAG_NAME5", attach.getParameter("hashtag5").trim());
-
-					service.createTeam(param);
-
-					try {
-						String teamName = attach.getParameter("teamName").trim();
-						int teamNo = service.teamNameDupChk(teamName);
-						String originFileName=attach.getFile("f1").get(0).getName();
-						String format = originFileName.substring(originFileName.lastIndexOf(".")+1);
-						System.out.println(format);
-						attach.upload("f1", teamNo + "_profile_t.png");
-					} catch(Exception e) {
-
-					}
-
-
-					map.put("status", 1);
-					map.put("msg", "팀생성 성공");
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					map.put("status", 0);
-					map.put("msg", "팀생성 실패");
+				param.put("I_TEAM_NAME", team.getTeamName().trim());
+				param.put("I_LEADER_ID", team.getLeaderId().trim());
+				param.put("I_STUDY_TYPE", team.getStudyType().trim());
+				param.put("I_ONOFFLINE", team.getOnOffLine().trim());
+				param.put("I_MAX_MEMBER", team.getMaxMember());
+				param.put("I_STARTDATE", team.getStartDate().trim());
+				param.put("I_ENDDATE", team.getEndDate().trim());
+				param.put("I_BRIEF_INFO", team.getBriefInfo().trim());
+				param.put("I_TEAM_INFO", team.getTeamInfo().trim());
+				for (int i=1; i<=5; i++) {
+					param.put("I_HASHTAG_NAME1"+i, hashlist.get(i).getHashtagName());
 				}
-				return map;
-			}
 
-			else if(gubun.equals("update")) {
-				HashMap<String, Object> param = new HashMap<>();
-
-				try {
-
-					String teamName = attach.getParameter("teamName").trim();
-					int teamNo = Integer.parseInt(attach.getParameter("teamNo").trim());
-					String studyType = attach.getParameter("studyType").trim();
-					String onOffLine = attach.getParameter("onOffLine").trim();
-					int maxMember = Integer.parseInt(attach.getParameter("maxMember").trim());
-					String startDate = attach.getParameter("startDate").trim();
-					String endDate = attach.getParameter("endDate").trim();
-					String briefInfo = attach.getParameter("briefInfo").trim();
-					String teamInfo = attach.getParameter("teamInfo").trim();
-					String hashtag1 = attach.getParameter("hashtag1").trim();
-					String hashtag2 = attach.getParameter("hashtag2").trim();
-					String hashtag3 = attach.getParameter("hashtag3").trim();
-					String hashtag4 = attach.getParameter("hashtag4").trim();
-					String hashtag5 = attach.getParameter("hashtag5").trim();
+				service.createTeam(param);
 
 
-					TeamDTO t = new TeamDTO();
+				String teamName = team.getTeamName().trim();
+				int teamNo = service.teamNameDupChk(teamName);
+				String attachesDir = "C:\\KOSA202307\\attaches"; //첨부경로
 
-					t.setTeamNo(teamNo);
-					t.setTeamName(teamName);
-					t.setStudyType(studyType);
-					t.setOnOffLine(onOffLine);
-					t.setMaxMember(maxMember);
-					t.setStartDate(startDate);
-					t.setEndDate(endDate);
-					t.setBriefInfo(briefInfo);
-					t.setTeamInfo(teamInfo);
-					System.out.println(t);
+				if(f1 != null && f1.getSize() > 0) {
+					String targetFileName = teamNo + "_profile.png";
+					File targetFile = new File(attachesDir, targetFileName);
+					FileCopyUtils.copy(f1.getBytes(), targetFile);
 
+					//----섬네일파일 만들기 START----
+					int width=100;
+					int height=100;            
 
-					List<Map> list = new ArrayList<>();
-					if(hashtag1 != null) {
-						Map<String, Object> teamHashtag1 = new HashMap<>();
-						teamHashtag1.put("teamNo", teamNo);
-						teamHashtag1.put("hashtag" , hashtag1);
-						list.add(teamHashtag1);
-					}
-					if(hashtag2 != null) {
-						Map<String, Object> teamHashtag2 = new HashMap<>();
-						teamHashtag2.put("teamNo", teamNo);
-						teamHashtag2.put("hashtag" , hashtag2);
-						list.add(teamHashtag2);
-					}
-					if(hashtag3 != null) {
-						Map<String, Object> teamHashtag3 = new HashMap<>();
-						teamHashtag3.put("teamNo", teamNo);
-						teamHashtag3.put("hashtag" , hashtag3);
-						list.add(teamHashtag3);
-					}
-					if(hashtag4 != null) {
-						Map<String, Object> teamHashtag4 = new HashMap<>();
-						teamHashtag4.put("teamNo", teamNo);
-						teamHashtag4.put("hashtag" , hashtag4);
-						list.add(teamHashtag4);
-					}
-					if(hashtag5 != null) {
-						Map<String, Object> teamHashtag5 = new HashMap<>();
-						teamHashtag5.put("teamNo", teamNo);
-						teamHashtag5.put("hashtag" , hashtag5);
-						list.add(teamHashtag5);
-					}
-					HashMap<String, Object> params = new HashMap<>();
-					params.put("list", list);
-					System.out.println(params);
-					service.updateTeam(t);
-					if(!(hashtag1 == null & hashtag2 == null & hashtag3 == null
-							& hashtag4 == null & hashtag5 == null)) {
-						service.deleteHashtag(teamNo);
-						service.updateHashtag(params);
-					}
-
-					try {
-						String originFileName=attach.getFile("f1").get(0).getName();
-						//attach.upload("f1", teamNo + "_profile"+originFileName);
-						String format = originFileName.substring(originFileName.lastIndexOf(".")+1);
-						System.out.println(format);
-						attach.upload("f1", teamNo + "_profile.png");
-					} catch(Exception e) {
-
-					}
-					map.put("status", 1);
-					map.put("msg", "팀수정 성공");
-				} catch (Exception e) {
-					e.printStackTrace();
-					map.put("status", 0);
-					map.put("msg", "팀수정 실패");
+					String thumbFileName = teamNo + "_profile_t.png"; //섬네일파일명
+					File thumbFile = new File(attachesDir, thumbFileName);
+					FileOutputStream thumbnailOS = new FileOutputStream(thumbFile);//출력스트림
+					InputStream thumbnailIS = f1.getInputStream(); //첨부파일 입력스트림            
+					Thumbnailator.createThumbnail(thumbnailIS, thumbnailOS, width, height);
+					//-----섬네일파일 만들기 END------
+				}else {
+					throw new Exception("프로필 파일이 없습니다");
 				}
-				return map;
 
+				map.put("status", 1);
+				map.put("msg", "팀생성 성공");
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				map.put("status", 0);
+				map.put("msg", "팀생성 실패");
 			}
-		} catch (FileUploadException e) {
-			e.printStackTrace();
+			return map;
 		}
-		return map;
+
+		else if(gubun.equals("update")) {
+			Map<String, Object> map = new HashMap<>();
+			HashMap<String, Object> param = new HashMap<>();
+
+			try {
+
+				service.updateTeam(team);
+
+
+				service.deleteHashtag(team.getTeamNo());
+				for (int i=1; i<=5; i++) {
+					param.put("I_HASHTAG_NAME1"+i, hashlist.get(i).getHashtagName());
+				}
+				service.updateHashtag(param);
+
+				String teamName = team.getTeamName().trim();
+				int teamNo = service.teamNameDupChk(teamName);
+				String attachesDir = "C:\\KOSA202307\\attaches"; //첨부경로
+
+				if(f1 != null && f1.getSize() > 0) {
+					String targetFileName = teamNo + "_profile.png";
+					File targetFile = new File(attachesDir, targetFileName);
+					FileCopyUtils.copy(f1.getBytes(), targetFile);
+
+					//----섬네일파일 만들기 START----
+					int width=100;
+					int height=100;            
+
+					String thumbFileName = teamNo + "_profile_t.png"; //섬네일파일명
+					File thumbFile = new File(attachesDir, thumbFileName);
+					FileOutputStream thumbnailOS = new FileOutputStream(thumbFile);//출력스트림
+					InputStream thumbnailIS = f1.getInputStream(); //첨부파일 입력스트림            
+					Thumbnailator.createThumbnail(thumbnailIS, thumbnailOS, width, height);
+					//-----섬네일파일 만들기 END------
+				}else {
+					throw new Exception("프로필 파일이 없습니다");
+				}
+				map.put("status", 1);
+				map.put("msg", "팀수정 성공");
+			} catch (Exception e) {
+				e.printStackTrace();
+				map.put("status", 0);
+				map.put("msg", "팀수정 실패");
+			}
+			return map;
+		}
+		return null;
 	}
 
 	@GetMapping("/main")
@@ -393,9 +356,6 @@ public class TeamController {
 		}
 		return map;
 	}
-
-
-
 
 
 	/* 워니자리 */
@@ -727,15 +687,10 @@ public class TeamController {
 
 				TaskDTO taskDTO = new TaskDTO();
 
-				//				Date formatDueDate1 = formatter.parse(request.getParameter("duedate1"));
-				//				Date formatDueDate2 = formatter.parse(request.getParameter("duedate2"));
-				//				Date formatEndDate = formatter.parse(request.getParameter("enddate"));
-
 				Date formatDueDate1 = formatter.parse(duedate1);
 				Date formatDueDate2 = formatter.parse(duedate2);
 				Date formatEndDate = formatter.parse(enddate);
 
-				//                taskDTO.setId(request.getParameter("id"));
 				taskDTO.setId(id);
 				taskDTO.setDuedate1(formatDueDate1);
 				taskDTO.setDuedate2(formatDueDate2);
