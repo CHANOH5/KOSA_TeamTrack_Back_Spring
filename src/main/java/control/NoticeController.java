@@ -2,6 +2,8 @@ package control;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,12 +37,12 @@ public abstract class NoticeController {
 	private TeamService teamService;
 
 	@GetMapping("/mainnotice")
-	public Map<String, Object> mainnotice(String loginedId, Integer teamNo) throws FindException {
+	public Map<String, Object> mainnotice(String id, Integer teamNo) throws FindException {
 		Map<String, Object> map = new HashMap<>();
 		Integer memStatus = 0;
 		
 		try {			
-			memStatus = teamService.leaderChk(loginedId, teamNo);
+			memStatus = teamService.leaderChk(id, teamNo);
 			NoticeDTO notice = noticeService.findMainNotice(teamNo);
 			map.put("memStatus", memStatus);
 			map.put("notice", notice);
@@ -134,14 +136,14 @@ public abstract class NoticeController {
 			String findName = teamNo+"_"+noticeNo+"_notice_";
 
 			if(f1 != null && f1.getSize() > 0) {				
-				String originProfileFileName = f1.getOriginalFilename();
+				String originFileName = f1.getOriginalFilename();
 				for(File file : dir.listFiles()) {
 					String existFileName = file.getName();
 					if(existFileName.startsWith(findName)) {
 						file.delete();
 					}
 				}
-				String targetFileName = teamNo+"_"+noticeNo+"_notice_"+ originProfileFileName;
+				String targetFileName = teamNo+"_"+noticeNo+"_notice_"+ originFileName;
 				File targetFile = new File(attachesDir, targetFileName);
 				FileCopyUtils.copy(f1.getBytes(), targetFile);
 			}
@@ -156,5 +158,74 @@ public abstract class NoticeController {
 		}
 
 		return map;
+	}
+	
+	@GetMapping("/noticedetail")
+	public Map<String, Object> noticedetail(String id, Integer teamNo, Integer noticeNo) {
+		Map map = new HashMap<>();
+		Integer memStatus = 0;
+		String fileName = "null";
+		
+		String attachesDir = "C:\\KOSA202307\\attaches";
+		File dir = new File(attachesDir);
+		
+		try {
+			memStatus = teamService.leaderChk(id, teamNo);
+			NoticeDTO notice = noticeService.findByNoticeNo(teamNo, noticeNo);
+			
+			String findName = teamNo+"_"+noticeNo+"_notice_";
+			
+			try {
+				for(File file : dir.listFiles()) {
+					String existFileName = file.getName();
+					if(existFileName.startsWith(findName)) {
+						fileName = existFileName.replaceFirst(findName,"");
+						break;
+					}
+				}
+				map.put("fileName", fileName);
+			} catch(Exception e) {
+				
+			}
+			
+			map.put("memStatus", memStatus);
+			map.put("notice", notice);
+			
+			return map;
+		} catch (FindException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@GetMapping("/noticefiledownload")
+	public ResponseEntity<?> noticefiledownload(Integer teamNo, Integer noticeNo) {
+		String attachesDir = "C:\\KOSA202307\\attaches";
+		File dir = new File(attachesDir);
+		ResponseEntity<?> entity = null;
+		
+		String fileName = teamNo+"_"+noticeNo+"_notice_";
+
+		for(File f: dir.listFiles()) {
+			String existFileName = f.getName();
+			if(existFileName.startsWith(fileName)) {
+		
+				HttpStatus status = HttpStatus.OK;
+				HttpHeaders headers = new HttpHeaders();
+				headers.add(HttpHeaders.CONTENT_DISPOSITION,
+						    "attachment;filename=" + URLEncoder.encode(existFileName, "UTF-8"));
+				
+				System.out.println("in download file: " + f + ", file size:" + f.length());
+				String contentType = Files.probeContentType(f.toPath());//파일의 형식		
+				headers.add(HttpHeaders.CONTENT_TYPE, contentType); //응답형식		
+				headers.add(HttpHeaders.CONTENT_LENGTH, ""+f.length());//응답길이
+				
+				byte[]bArr = FileCopyUtils.copyToByteArray(f);
+				entity = new ResponseEntity<>(bArr, headers, status);//응답상태코드
+				return entity;
+			}
+		}
+
+		return entity;
 	}
 }
