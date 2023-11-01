@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Repository
+@Repository(value = "teamDAO")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class TeamDAOImpl implements TeamDAO {
 
