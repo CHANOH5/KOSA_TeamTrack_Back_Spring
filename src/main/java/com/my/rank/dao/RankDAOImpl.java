@@ -12,6 +12,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.my.exception.AddException;
 import com.my.exception.FindException;
@@ -102,6 +103,7 @@ public class RankDAOImpl implements RankDAO {
 	}
 
 	@Override
+	@Transactional(rollbackFor = AddException.class)
 	public void insertRankInfo(Integer teamNo, String id) throws AddException {
 		SqlSession session = null;
 		
@@ -111,7 +113,6 @@ public class RankDAOImpl implements RankDAO {
 			map.put("team_no", teamNo);
 			map.put("id", id);
 			session.insert("com.my.rank.RankMapper.insertRankInfo", map);
-			session.commit();
 			System.out.println("commit성공");
 		} catch (Exception e) {
 			throw new AddException("랭킹 정보 추가 실패");
@@ -124,6 +125,7 @@ public class RankDAOImpl implements RankDAO {
 	}
 	
 	@Override
+	@Transactional(rollbackFor = ModifyException.class)
 	public void updateRankInfo(Integer teamNo, String rankDate, Integer rank, Double totalScore, String id, Integer month) 
 			throws ModifyException {
 		SqlSession session = null;
@@ -138,7 +140,6 @@ public class RankDAOImpl implements RankDAO {
 			map.put("id", id);
 			map.put("month", month);
 			session.update("com.my.rank.RankMapper.updateRankInfo", map);
-			session.commit();
 			System.out.println("commit성공");
 		} catch (Exception e) {
 			throw new ModifyException("랭킹 정보 업데이트 실패");
