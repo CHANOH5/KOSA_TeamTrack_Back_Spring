@@ -43,10 +43,10 @@ public class TeamController {
 	@Autowired protected TeamServiceImpl service;
 	@Autowired protected RankServiceImpl rankservice;
 
-	@Autowired protected SignupTeamDTO signupTeamDTO;
-	@Autowired protected AttendanceDTO attendanceDTO;
-	@Autowired protected TeamDTO teamDTO;
-	@Autowired protected NoticeDTO noticeDTO;
+//	@Autowired protected SignupTeamDTO signupTeamDTO;
+//	@Autowired protected AttendanceDTO attendanceDTO;
+//	@Autowired protected TeamDTO teamDTO;
+//	@Autowired protected NoticeDTO noticeDTO;
 
 	/* 서현웅니 */
 	@GetMapping("/teamnamedupcheck")

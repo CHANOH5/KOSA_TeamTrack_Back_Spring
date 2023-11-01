@@ -38,14 +38,18 @@ import lombok.Setter;
 @Service
 @Setter @Getter  @NoArgsConstructor @AllArgsConstructor
 public class TeamServiceImpl implements TeamService {
-
-	private TeamDAO teamDAO;
-	private NoticeDAO noticeDAO;
-	private TaskDAO taskDAO;
-	private QnaBoardDAO qnaDAO;
 	
 	@Autowired
-	private TeamDAOImpl teamDAOImpl;
+	private TeamDAO teamDAO;
+	@Autowired
+	private NoticeDAO noticeDAO;
+	@Autowired
+	private TaskDAO taskDAO;
+	@Autowired
+	private QnaBoardDAO qnaDAO;
+	
+	
+	private TeamDAO teamDAOImpl;
 	
 	private static TeamServiceImpl service = new TeamServiceImpl();
 	
