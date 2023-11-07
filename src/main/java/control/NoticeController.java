@@ -38,7 +38,7 @@ public abstract class NoticeController {
 	private TeamService teamService;
 
 	@GetMapping("/mainnotice")
-	public Map<String, Object> mainnotice(String id, Integer teamNo) throws FindException {
+	public Map<String, Object> mainNotice(String id, Integer teamNo) throws FindException {
 		Map<String, Object> map = new HashMap<>();
 		Integer memStatus = 0;
 		
@@ -57,7 +57,7 @@ public abstract class NoticeController {
 	}
 	
 	@GetMapping("/noticelist")
-	public PageGroup<NoticeDTO> noticelist(Integer teamNo, String currentPage) {
+	public PageGroup<NoticeDTO> noticeList(Integer teamNo, String currentPage) {
 		int cp = 1;
 		if (currentPage != null && !currentPage.equals("")) {
 			cp = Integer.parseInt(currentPage);
@@ -74,7 +74,7 @@ public abstract class NoticeController {
 	}
 	
 	@GetMapping("/setmainnotice")
-	public Map<String, Object> setmainnotice(Integer teamNo, Integer noticeNo, Integer mainStatus) {
+	public Map<String, Object> setmainNotice(Integer teamNo, Integer noticeNo, Integer mainStatus) {
 		Map<String, Object> map = new HashMap<>();
 
 		try {
@@ -107,7 +107,7 @@ public abstract class NoticeController {
 	}
 	
 	@PostMapping("/writenotice")
-	public Map<String,Object> writenotice(Integer teamNo, NoticeDTO notice, MultipartFile f1) throws Exception{
+	public Map<String,Object> writeNotice(Integer teamNo, NoticeDTO notice, MultipartFile f1) throws Exception{
 		Map<String, Object> map = new HashMap<>();
 		Date regDate = Date.from(Instant.now());
 		Integer noticeNo;
@@ -162,7 +162,7 @@ public abstract class NoticeController {
 	}
 	
 	@GetMapping("/noticedetail")
-	public Map<String, Object> noticedetail(String id, Integer teamNo, Integer noticeNo) {
+	public Map<String, Object> noticeDetail(String id, Integer teamNo, Integer noticeNo) {
 		Map map = new HashMap<>();
 		Integer memStatus = 0;
 		String fileName = "null";
@@ -200,7 +200,7 @@ public abstract class NoticeController {
 	}
 	
 	@GetMapping("/noticefiledownload")
-	public ResponseEntity<?> noticefiledownload(Integer teamNo, Integer noticeNo) {
+	public ResponseEntity<?> noticeFileDownload(Integer teamNo, Integer noticeNo) {
 		String attachesDir = "C:\\KOSA202307\\attaches";
 		File dir = new File(attachesDir);
 		ResponseEntity<?> entity = null;
@@ -236,7 +236,7 @@ public abstract class NoticeController {
 	}
 	
 	@GetMapping("/editnotice")
-	public Map<String, Object> editnotice(Integer teamNo, NoticeDTO notice, Integer status, MultipartFile f1) {
+	public Map<String, Object> editNotice(Integer teamNo, NoticeDTO notice, Integer status, MultipartFile f1) {
 		Map<String, Object> map = new HashMap<>();
 		Integer mainStatus = 0;
 		Integer mainChk = 0;

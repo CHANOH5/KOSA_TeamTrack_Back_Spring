@@ -3,6 +3,7 @@ package control;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +33,7 @@ import com.my.team.dto.TeamDTO;
 import com.my.team.dto.TeamHashtagDTO;
 import com.my.team.service.TeamServiceImpl;
 import com.my.util.MainPageGroup;
+import com.my.util.PageGroup;
 
 import net.coobird.thumbnailator.Thumbnailator;
 
@@ -359,7 +361,87 @@ public class TeamController {
 
 
 	/* 워니자리 */
+	@GetMapping("/cancelwaiting")
+	public Map<String,Object> cancelWaiting(String id, Integer teamNo) {	
+		Map<String, Object> map = new HashMap<>();
 
+		try {
+			service.cancelWaiting(id, teamNo);
+			map.put("status", 1);
+			map.put("msg", "승인대기 취소되었습니다");
+		} catch (RemoveException e) {
+			e.printStackTrace();
+			map.put("status", 0);
+			map.put("msg", e.getMessage());
+		}
+
+		return map;
+	}
+	
+	@GetMapping("/myactivity")
+	public Map myActivity(String id, Integer teamNo) {
+		Map map = new HashMap<>();
+		
+		try {
+			map = service.myActivity(id, teamNo);
+			System.out.println(map.get("team"));
+			System.out.println(map.get("teammember"));
+			return map;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@GetMapping("/myteamlist")
+	public Map myTeamList(String id, Integer menuStatus, String currentPage) {
+		Map map = new HashMap<>();
+		int cp = 1;
+		if (currentPage != null && !currentPage.equals("")) {
+			cp = Integer.parseInt(currentPage);
+		}
+
+		try {
+			PageGroup<SignupTeamDTO> pg = service.findMyTeam(cp, id, menuStatus);
+			return map;
+		} catch (FindException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@GetMapping("/rejectcheck")
+	public Map<String, Object> rejectCheck(String id, Integer teamNo) {
+		Map<String, Object> map = new HashMap<>();
+		
+		try {
+			service.rejectCheck(id, teamNo);
+			map.put("status", 1);
+		} catch (RemoveException e) {
+			e.printStackTrace();
+			map.put("status", 0);
+			map.put("msg", e.getMessage());
+		}
+		return map;
+	}
+	
+	@GetMapping("/rejectedteam")
+	public Map rejectedTeam(String id, String currentPage) {
+
+		Map map = new HashMap<>();
+		int cp = 1;
+		if (currentPage != null && !currentPage.equals("")) {
+			cp = Integer.parseInt(currentPage);
+		}
+
+		try {
+			PageGroup<SignupTeamDTO> pg = service.findRejectedTeam(cp, id);
+			return map;
+		} catch (FindException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 
 
