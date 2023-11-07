@@ -5,28 +5,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.my.exception.AddException;
 import com.my.exception.FindException;
 import com.my.exception.ModifyException;
+import com.my.notice.dao.NoticeDAO;
+import com.my.qna.dao.QnaBoardDAO;
 import com.my.qna.dto.QnaBoardCommentDTO;
 import com.my.rank.dao.RankDAO;
 import com.my.rank.dao.RankDAOImpl;
 import com.my.rank.dto.RankDTO;
+import com.my.task.dao.TaskDAO;
 import com.my.task.dto.MemberTaskDTO;
 import com.my.task.dto.TaskDTO;
+import com.my.team.dao.TeamDAO;
+import com.my.team.dao.TeamDAOImpl;
 import com.my.team.dto.AttendanceDTO;
 import com.my.team.dto.TeamMemberDTO;
 
+@Service
 public class RankServiceImpl implements RankService {
 	
+	@Autowired
 	private RankDAO rankDao;
-	private static RankServiceImpl service = new RankServiceImpl();
-	public RankServiceImpl() {
-		rankDao = new RankDAOImpl();
-	}
-	public static RankServiceImpl getInstance() {
-		return service;
-	}
+	
+//	private static RankServiceImpl service = new RankServiceImpl();
+//	
+//	public RankServiceImpl() {
+//		rankDao = new RankDAOImpl();
+//	}
+//	public static RankServiceImpl getInstance() {
+//		return service;
+//	}
 	
 	@Override
 	public List<RankDTO> findByMonth(Integer teamNo, Integer month) throws FindException {

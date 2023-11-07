@@ -45,12 +45,9 @@ public class MyApplicationContext {
 		HikariConfig config = new HikariConfig();
 		
 		config.setDriverClassName("net.sf.log4jdbc.sql.jdbcapi.DriverSpy");
-//		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
-		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@localhost:1521:xe");
-//		config.setUsername("admin");
-		config.setUsername("hr");
-//		config.setPassword("Kosaproject2023");
-		config.setPassword("hr");
+		config.setJdbcUrl("jdbc:log4jdbc:oracle:thin:@STUDYPROJECT_medium?TNS_ADMIN=C://opt//OracleCloudWallet//VFX");
+		config.setUsername("admin");
+		config.setPassword("Kosaproject2023");
 		config.setMinimumIdle(3);
 		
 		return config;
